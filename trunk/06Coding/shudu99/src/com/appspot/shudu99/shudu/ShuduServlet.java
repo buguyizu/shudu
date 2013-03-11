@@ -18,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressWarnings("serial")
 public class ShuduServlet extends HttpServlet {
 
+    private static final Logger log = Logger.getLogger(ShuduServlet.class.getName());
+
 	// a 4d integer array of all shudu data
 	private int array4D[][][][] = new int[][][][] {
 			{ { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } },
@@ -53,36 +55,34 @@ public class ShuduServlet extends HttpServlet {
 	// 2000 2001 2002 2010 2011 2012 2020 2021 2022
 	// 2100 2101 2102 2110 2111 2112 2120 2121 2122
 	// 2200 2201 2202 2210 2211 2212 2220 2221 2222
-	
+
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		
+
 		resp.setContentType("text/plain");
 
 		DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-		Logger.getAnonymousLogger().info(df.format(new Date()) + " START \n");
+		log.info(df.format(new Date()) + " START");
 
 		setTableValue();
 		String printString = getPrintString();
 		printString = StringUtils.replace(printString, "\t\n", "\n");
-		
-		resp.getWriter().println("A page to get new sudoku array!");
+
+		resp.getWriter().println("Refresh to get a new sudoku array!");
 		resp.getWriter().print(printString);
 
-		Logger.getAnonymousLogger().info(printString + "\n");
-		Logger.getAnonymousLogger().info(Integer.toString(c) + "\n");
-		Logger.getAnonymousLogger().info(df.format(new Date()) + " END \n");
+		log.info(printString);
+		log.info(Integer.toString(c));
+		log.info(df.format(new Date()) + " END \n");
 	}
-	
+
 	private String getPrintString() {
 		StringBuffer info = new StringBuffer("\n");
-		
+
 		for (int i = 0; i < 3; i++, info.append("\n")) {
 			for (int j = 0; j < 3; j++, info.append("\n")) {
 				for (int k = 0; k < 3; k++) {
 					for (int l = 0; l < 3; l++) {
-						// array4D[i][j][k][l] = (i + 1) * 1000 + (j + 1) * 100
-						// + (k + 1) * 10 + l + 1;
 						info.append(array4D[i][j][k][l] + "\t");
 					}
 				}
@@ -91,7 +91,7 @@ public class ShuduServlet extends HttpServlet {
 		return info.toString();
 	}
 
-	
+
 	private void setTableValue() {
 
 		int i = 0;
@@ -177,8 +177,6 @@ public class ShuduServlet extends HttpServlet {
 								break J;
 							}
 						}
-
-						// print();
 					}
 				}
 			}
@@ -194,7 +192,8 @@ public class ShuduServlet extends HttpServlet {
 			return range[rnd];
 		}
 	}
-	
+
+	// set range of each cell
 	private void setCellRange(int i, int j, int k, int l) {
 
 		if (rangeMap.containsKey(getMapKey(i, j, k, l))) {
