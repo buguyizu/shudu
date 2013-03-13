@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>ants</title>
+	<script type="text/javascript" language="javascript">
+
+		var n=1;
+		var createTagName="P";
+		var antsCount=100;
+		var antsArray = new Array();
+		var noPause="1";
+		var timeout=200;
+		var totleStep=50;
+
+		function ant(element) {
+
+			this.element=element;
+			this.moveUnit="px";
+			this.speed=getRnd(10,80);
+			this.enabled=true;
+
+			this.angle=0;
+			this.radian=0;
+			this.X=0;
+			this.Y=0;
+
+			this.element.style.color="RGB("+getRnd(0,255)+","+getRnd(0,255)+","+getRnd(0,255)+")";
+
+			function getRnd(l,u) {
+				return parseInt((u-l+1)*Math.random()+l);
+			}
+			function getReflectAngle(thisAngle, thatAngle) {
+				return thatAngle * 2 - thisAngle;
+			}
+
+			this.setAngle=function(angle) {
+				this.angle=angle;
+				this.radian=this.angle*Math.PI/180;
+				this.X=this.speed*Math.cos(this.radian);
+				this.Y=this.speed*Math.sin(this.radian);
+			};
+
+			//→:0; ↓:90;
+			this.setAngle(getRnd(0,360));
+			//this.setAngle(180);
+
+			this.move=function() {
+
+				var parentLeftBorder = this.element.parentElement.style.borderLeftWidth.substring(0,1);
+				var parentTopBorder = this.element.parentElement.style.borderTopWidth.substring(0,1);
+				var offsetLeft = this.element.offsetLeft;
+				var offsetTop = this.element.offsetTop;
+				if (document.all) {//when ie
+					offsetLeft = offsetLeft - parentLeftBorder;
+					offsetTop = offsetTop - parentTopBorder;
+				}
+
+				var s=this;
+				this.element.onmouseout=function() {
+					if (s.enabled) {
+						s.enabled=false;
+						//s.element.style.borderWidth="2px";
+					} else {
+						s.enabled=true;
+						//s.element.style.borderWidth="1px";
+					}
+				};
+
+				this.element.ondrag=function() {
+					s.element.style.left=s.element.offsetLeft+event.offsetX+s.moveUnit;
+					s.element.style.top=s.element.offsetTop+event.offsetY+s.moveUnit;
+				};
+
+				var x=0;
+				var y=0;
+
+				if (offsetLeft+this.X<=0) {
+					x=0-offsetLeft;
+				} else if (offsetLeft+this.X>=this.element.offsetParent.clientWidth-this.element.offsetWidth) {
+					x=this.element.offsetParent.clientWidth-this.element.offsetWidth-offsetLeft
+				} else {
+					x=this.X;
+				}
+
+				if (offsetTop+this.Y<=0) {
+					y=0-offsetTop;
+				} else if (offsetTop+this.Y>=this.element.offsetParent.clientHeight-this.element.offsetHeight) {
+					y=this.element.offsetParent.clientHeight-this.element.offsetHeight-offsetTop;
+				} else {
+					y=this.Y;
+				}
+
+				if (x!=this.X) {
+					if (y==this.Y) {
+						y=x*Math.tan(this.radian);
+					}
+					this.setAngle(getReflectAngle(this.angle, 90));
+				} else if (y!=this.Y) {
+					if (x==this.X) {
+						x=y/Math.tan(this.radian);
+					}
+					this.setAngle(getReflectAngle(this.angle, 0));
+				}
+
+				if (this.enabled) {
+					this.element.style.left=offsetLeft+x+this.moveUnit;
+					this.element.style.top=offsetTop+y+this.moveUnit;
+					document.getElementById("text1").value=this.element.style.left;
+					document.getElementById("text2").value=this.element.style.top;
+				}
+
+			};
+		};
+
+		function repeat() {
+			document.getElementById("text3").value=n;
+			if (noPause) {
+				for(var i=0; i<antsArray.length;i++){
+					if (antsArray[i]!=null && n!=1){
+						antsArray[i].move();
+					}
+				}
+			} else {
+				n--;
+			}
+			if (n>0 && n<totleStep) {
+				window.setTimeout("repeat()", timeout);
+			}
+			n++;
+		}
+
+		function startMove() {
+
+			for(var i=0; i<antsCount;i++){
+				var newNode=document.createElement(createTagName);
+				newNode.style.position="absolute";
+				newNode.style.margin="0px";
+				newNode.style.left="0px";
+				newNode.style.top="0px";
+				newNode.style.width="10px";
+				newNode.style.height="10px";
+				newNode.style.borderStyle="solid";
+				newNode.style.borderWidth="0px";
+				newNode.style.font="italic normal bolder 16pt Arial";
+				newNode.style.lineHeight="10px";
+				newNode.innerText="○";
+				newNode.innerHTML="○";
+				document.getElementById("div1").appendChild(newNode);
+				document.getElementById("text1").value=newNode.style.left;
+				document.getElementById("text2").value=newNode.style.top;
+			}
+
+			for(var i=0; i<document.getElementsByTagName(createTagName).length;i++){
+				antsArray[i] = new ant(document.getElementsByTagName(createTagName)[i]);
+			}
+
+			repeat();
+			document.getElementById("button1").disabled="disabled";
+		}
+
+		function pauseMove() {
+			if (noPause) {
+				noPause=null;
+			} else {
+				noPause="1";
+			}
+		}
+	</script>
+</head>
+<body>
+	<input type="button" id="button1" value="start" onclick="startMove();"></input>
+	<input type="button" id="button2" value="pause" onclick="pauseMove();"></input>
+	<input type="text" id="text1" />
+	<input type="text" id="text2" />
+	<input type="text" id="text3" />
+	<div id="div1" style="position:absolute;left:50px;top:50px;width:800px;height:600px;border-style:solid;border-width:1px;"></div>
+</body>
+</html>
