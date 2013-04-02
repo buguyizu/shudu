@@ -1,37 +1,87 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>ants</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8;" />
+	<title>balls</title>
 	<script type="text/javascript" language="javascript">
 
 		var n=1;
 		var createTagName="P";
-		var antsCount=100;
-		var antsArray = new Array();
+		var ballsCount=300;
+		var ballSize = 1;
+		var ballsArray = new Array();
 		var noPause="1";
-		var timeout=200;
-		var totleStep=50;
+		var timeout=300;
+		var totleStep=0;
+		var startFlg=1;//0:可以在div1内选点;1:不可以;
+		var startX = 0;
+		var startY = 0;
+		var panel = null;
 
-		function ant(element) {
+		function ball(index) {
 
-			this.element=element;
-			this.moveUnit="px";
-			this.speed=getRnd(10,80);
 			this.enabled=true;
+			this.element=document.createElement(createTagName);
+			//每个球的步伐是否一样，还是随机。
+			this.speed=getRnd(10,80);
+			this.moveUnit="px";
 
 			this.angle=0;
 			this.radian=0;
+			//X,Y有正负，只与角度有关。仅在设置角度的同时赋值。是speed在横纵方向上的投射值。
 			this.X=0;
 			this.Y=0;
 
-			this.element.style.color="RGB("+getRnd(0,255)+","+getRnd(0,255)+","+getRnd(0,255)+")";
+			function setElement(element, index) {
+				panel.appendChild(element);
+				element.style.position="absolute";
+				element.style.margin="0px";
+				element.style.borderStyle="solid";
+				element.style.color="RGB("+getRnd(0,255)+","+getRnd(0,255)+","+getRnd(0,255)+")";
+				//↓显示出来的是框还是圈
+				element.style.borderWidth="0px";
+				element.innerText="○";
+				element.innerHTML="○";
+				element.style.font="italic normal bolder 16pt Arial";
+				element.style.lineHeight=ballSize+"px";
+				element.style.fontSize=ballSize/10+"em";
+				//↑显示出来的是框还是圈
+				element.id="p"+index;
+				element.style.width=ballSize+"px";
+				element.style.height=ballSize+"px";
+				element.style.left = startX + "px";
+				element.style.top = startY + "px";
+
+				/*
+				var s=this;
+				this.element.onmouseout=function() {
+					if (s.enabled) {
+						s.enabled=false;
+						s.element.style.borderWidth="2px";
+					} else {
+						s.enabled=true;
+						s.element.style.borderWidth="1px";
+					}
+				};
+
+				this.element.ondrag=function() {
+					s.element.style.left=s.element.offsetLeft+event.offsetX+s.moveUnit;
+					s.element.style.top=s.element.offsetTop+event.offsetY+s.moveUnit;
+				};*/
+			}
 
 			function getRnd(l,u) {
 				return parseInt((u-l+1)*Math.random()+l);
 			}
 			function getReflectAngle(thisAngle, thatAngle) {
-				return thatAngle * 2 - thisAngle;
+				var reflectAngle = thatAngle * 2 - thisAngle;
+				while (reflectAngle < 0) {
+					reflectAngle += 360;
+				}
+				while (reflectAngle > 359) {
+					reflectAngle -= 360;
+				}
+				return reflectAngle;
 			}
 
 			this.setAngle=function(angle) {
@@ -41,84 +91,171 @@
 				this.Y=this.speed*Math.sin(this.radian);
 			};
 
-			//→:0; ↓:90;
+			setElement(this.element, index);
+			//最右下角时的坐标
+			this.MaxLeft=this.element.offsetParent.clientWidth-this.element.offsetWidth;
+			this.MaxTop=this.element.offsetParent.clientHeight-this.element.offsetHeight;
+			//偏界检查
+			if (this.element.offsetLeft > this.MaxLeft) {
+				this.element.style.left = this.MaxLeft + this.moveUnit;
+			}
+			if (this.element.offsetTop > this.MaxTop) {
+				this.element.style.top = this.MaxTop + this.moveUnit;
+			}
+
+			//→:0; ↓:90; ←:180; ↑:270;
 			this.setAngle(getRnd(0,360));
-			//this.setAngle(180);
+			//this.setAngle(35);
 
 			this.move=function() {
-
-				var parentLeftBorder = this.element.parentElement.style.borderLeftWidth.substring(0,1);
-				var parentTopBorder = this.element.parentElement.style.borderTopWidth.substring(0,1);
+				//当前坐标
 				var offsetLeft = this.element.offsetLeft;
 				var offsetTop = this.element.offsetTop;
+
 				if (document.all) {//when ie
-					offsetLeft = offsetLeft - parentLeftBorder;
-					offsetTop = offsetTop - parentTopBorder;
+					var parentLeftBorder = this.element.parentElement.style.borderLeftWidth;
+					var parentTopBorder = this.element.parentElement.style.borderTopWidth;
+					//最后两位是单位
+					var parentLeft = parentLeftBorder.substring(0, parentLeftBorder.length-2);
+					var parentTop = parentTopBorder.substring(0, parentTopBorder.length-2);
+					offsetLeft = offsetLeft - parseFloat(parentLeft);
+					offsetTop = offsetTop - parseFloat(parentTop);
 				}
-
-				var s=this;
-				this.element.onmouseout=function() {
-					if (s.enabled) {
-						s.enabled=false;
-						//s.element.style.borderWidth="2px";
-					} else {
-						s.enabled=true;
-						//s.element.style.borderWidth="1px";
-					}
-				};
-
-				this.element.ondrag=function() {
-					s.element.style.left=s.element.offsetLeft+event.offsetX+s.moveUnit;
-					s.element.style.top=s.element.offsetTop+event.offsetY+s.moveUnit;
-				};
-
+				//xy在偏出界的时候才与XY有区别
 				var x=0;
 				var y=0;
+				var z1=0, z2=0;//0:正常移动; 1,2:偏界;
 
+				//clientWidth:不包滚动条等边线; offsetWidth:包滚动条等边线.
 				if (offsetLeft+this.X<=0) {
-					x=0-offsetLeft;
-				} else if (offsetLeft+this.X>=this.element.offsetParent.clientWidth-this.element.offsetWidth) {
-					x=this.element.offsetParent.clientWidth-this.element.offsetWidth-offsetLeft
-				} else {
-					x=this.X;
+					//如果偏出左界
+					z1=1;
+				} else if (offsetLeft+this.X>=this.MaxLeft) {
+					//如果偏出右界
+					z1=2;
 				}
 
 				if (offsetTop+this.Y<=0) {
-					y=0-offsetTop;
-				} else if (offsetTop+this.Y>=this.element.offsetParent.clientHeight-this.element.offsetHeight) {
-					y=this.element.offsetParent.clientHeight-this.element.offsetHeight-offsetTop;
-				} else {
-					y=this.Y;
+					//如果偏出上界
+					z2=1;
+				} else if (offsetTop+this.Y>=this.MaxTop) {
+					//如果偏出下界
+					z2=2;
 				}
 
-				if (x!=this.X) {
-					if (y==this.Y) {
-						y=x*Math.tan(this.radian);
+				var angleToSquare;
+				var hv=-1;//-1:不反弹;0:上下界反弹;1:左右界反弹.
+				if (z1==0 && z2==0) {
+					//正常移动
+					x=this.X; y=this.Y;
+				} else if (z1==0 && z2==1) {
+					//如果偏出上界，则在上界停住。
+					y=0-offsetTop;
+					hv=0;
+				} else if (z1==0 && z2==2) {
+					//如果偏出下界，则在下界停住。
+					y=this.MaxTop-offsetTop;
+					hv=0;
+				} else if (z1==1 && z2==0) {
+					//如果偏出左界，则在左界停住。
+					x=0-offsetLeft;
+					hv=1;
+				} else if (z1==1 && z2==1) {
+					//如果偏出左上界
+					//算出ball到左上角之间的夹角，与当前运动角度做比较。（以下同）
+					angleToSquare = Math.atan2(0-offsetTop, 0-offsetLeft)*180/Math.PI;
+					if (angleToSquare < 0) angleToSquare += 360;
+					if (this.angle < angleToSquare) {
+						//偏出左界
+						x=0-offsetLeft;
+						hv=1;
+					} else {
+						//偏出上界
+						y=0-offsetTop;
+						hv=0;
 					}
-					this.setAngle(getReflectAngle(this.angle, 90));
-				} else if (y!=this.Y) {
-					if (x==this.X) {
-						x=y/Math.tan(this.radian);
+				} else if (z1==1 && z2==2) {
+					//如果偏出左下界
+					angleToSquare = Math.atan2(this.MaxTop-offsetTop, 0-offsetLeft)*180/Math.PI;
+					if (this.angle > angleToSquare) {
+						//偏出左界
+						x=0-offsetLeft;
+						hv=1;
+					} else {
+						//偏出下界
+						y=this.MaxTop-offsetTop;
+						hv=0;
 					}
-					this.setAngle(getReflectAngle(this.angle, 0));
+				} else if (z1==2 && z2==0) {
+					//如果偏出右界，则在右界停住。
+					x=this.MaxLeft-offsetLeft;
+					hv=1;
+				} else if (z1==2 && z2==1) {
+					//如果偏出右上界
+					angleToSquare = Math.atan2(0-offsetTop, this.MaxLeft-offsetLeft)*180/Math.PI;
+					if (angleToSquare < 0) angleToSquare += 360;
+					if (this.angle > angleToSquare) {
+						//偏出右界
+						x=this.MaxLeft-offsetLeft;
+						hv=1;
+					} else {
+						//偏出上界
+						y=0-offsetTop;
+						hv=0;
+					}
+				} else if (z1==2 && z2==2) {
+					//如果偏出右下界
+					angleToSquare = Math.atan2(this.MaxTop-offsetTop, this.MaxLeft-offsetLeft)*180/Math.PI;
+					if (this.angle < angleToSquare) {
+						//偏出右界
+						x=this.MaxLeft-offsetLeft;
+						hv=1;
+					} else {
+						//偏出下界
+						y=this.MaxTop-offsetTop;
+						hv=0;
+					}
+				}
+
+				//设置反弹
+				if (hv != -1) {
+					//如果要在左右界停住，y要随便着x的变化调整；如果要在上下界停住，x要随便着y的变化调整。
+					hv == 0 ? x = y/Math.tan(this.radian) : y = x*Math.tan(this.radian);
+					this.setAngle(getReflectAngle(this.angle, hv*90));
 				}
 
 				if (this.enabled) {
+					//设置新坐标
 					this.element.style.left=offsetLeft+x+this.moveUnit;
 					this.element.style.top=offsetTop+y+this.moveUnit;
 					document.getElementById("text1").value=this.element.style.left;
 					document.getElementById("text2").value=this.element.style.top;
+					/*
+					var trace=document.createElement(createTagName);
+					panel.appendChild(trace);
+					trace.style.position="absolute";
+					trace.style.margin="0px";
+					trace.style.width="10px";
+					trace.style.height="10px";
+					trace.style.borderStyle="solid";
+					trace.style.borderWidth="1px";
+					trace.style.font="italic normal bolder 16pt Arial";
+					trace.style.lineHeight="10px";
+					trace.style.color="black";
+					trace.style.left=this.element.offsetLeft+this.moveUnit;
+					trace.style.top=this.element.offsetTop+this.moveUnit;
+					*/
 				}
-
 			};
-		};
+		}
 
 		function repeat() {
 			document.getElementById("text3").value=n;
+			document.getElementById('t3').value=totleStep-n;
 			if (noPause) {
-				for(var i=0; i<antsArray.length;i++){
-					if (antsArray[i]!=null && n!=1){
-						antsArray[i].move();
+				for(var i=0; i<ballsArray.length;i++){
+					if (ballsArray[i]!=null && n!=1){
+						ballsArray[i].move();
 					}
 				}
 			} else {
@@ -130,50 +267,75 @@
 			n++;
 		}
 
-		function startMove() {
-
-			for(var i=0; i<antsCount;i++){
-				var newNode=document.createElement(createTagName);
-				newNode.style.position="absolute";
-				newNode.style.margin="0px";
-				newNode.style.left="0px";
-				newNode.style.top="0px";
-				newNode.style.width="10px";
-				newNode.style.height="10px";
-				newNode.style.borderStyle="solid";
-				newNode.style.borderWidth="0px";
-				newNode.style.font="italic normal bolder 16pt Arial";
-				newNode.style.lineHeight="10px";
-				newNode.innerText="○";
-				newNode.innerHTML="○";
-				document.getElementById("div1").appendChild(newNode);
-				document.getElementById("text1").value=newNode.style.left;
-				document.getElementById("text2").value=newNode.style.top;
+		function pauseMove() {
+			if (startFlg == 0 || document.getElementById('t3').value=='0') {
+				return;
 			}
-
-			for(var i=0; i<document.getElementsByTagName(createTagName).length;i++){
-				antsArray[i] = new ant(document.getElementsByTagName(createTagName)[i]);
-			}
-
-			repeat();
-			document.getElementById("button1").disabled="disabled";
+			noPause = noPause ? null : "1";
+			document.getElementById('button2').value　= noPause ? ' pause ' : 'continue';
+		}
+		function init() {
+			document.getElementById('button1').disabled='';
+			panel = document.getElementById('div1');
+			document.getElementById('t3').value='30';
+		}
+		function getPoint() {
+			startFlg = 0;
+			panel.style.cursor = 'pointer';
+			document.getElementById('button1').disabled　=　"disabled";
 		}
 
-		function pauseMove() {
-			if (noPause) {
-				noPause=null;
-			} else {
-				noPause="1";
+		function startMove(event) {
+			var ev = window.event || event;
+			ballsCount = document.getElementById('t1').value;
+			ballSize = document.getElementById('t2').value;
+			totleStep = document.getElementById('t3').value;
+
+			var panelWidth = panel.style.borderLeftWidth;
+			panelWidth = panelWidth.substring(0, panelWidth.length-2);
+			//鼠标坐标
+			startX = ev.clientX - panel.offsetLeft - panelWidth;
+			startY = ev.clientY - panel.offsetTop - panelWidth;
+
+			if (startFlg == 1 || totleStep == 0) {
+				return;
+			}
+
+			startFlg = 1;
+			panel.style.borderWidth="1px";
+			panel.style.cursor = 'auto';
+
+			for(var i=0; i<ballsCount;i++){
+				ballsArray[i] = new ball();
+			}
+			repeat();
+		}
+		function into() {
+			if (startFlg == 0) {
+				panel.style.borderWidth = '2px';
+			}
+		}
+		function out(){
+			if (startFlg == 0) {
+				panel.style.borderWidth = '1px';
 			}
 		}
 	</script>
 </head>
-<body>
-	<input type="button" id="button1" value="start" onclick="startMove();"></input>
-	<input type="button" id="button2" value="pause" onclick="pauseMove();"></input>
-	<input type="text" id="text1" />
-	<input type="text" id="text2" />
-	<input type="text" id="text3" />
-	<div id="div1" style="position:absolute;left:50px;top:50px;width:800px;height:600px;border-style:solid;border-width:1px;"></div>
+<body onload="init();">
+	<div id="div0">
+		<input type="button" id="button1" value="start" onclick="getPoint();"></input>
+		<input type="button" id="button2" value=" pause " onclick="pauseMove();"></input>
+		count:<input type="text" id="t1" value="5" style="width:30px;" maxlength="3"/>
+		size:<input type="text" id="t2" value="20" style="width:30px;" maxlength="3"/>
+		step:<input type="text" id="t3" style="width:30px;" maxlength="2"/>
+	</div>
+	<div style="display:none;">
+		<input type="text" id="text1" />
+		<input type="text" id="text2" />
+		<input type="text" id="text3" />
+	</div>
+	<div id="div1" onmousedown="startMove(event);" onmouseenter="into();" onmouseout="out();"
+	 style="position:absolute;left:10px;top:40px;width:800px;height:500px;border-style:solid;border-width:1px;"></div>
 </body>
 </html>
