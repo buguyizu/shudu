@@ -1,0 +1,7 @@
+[DEFAULT]
+BASEURL=http://msdn2.microsoft.com/zh-cn/default.aspx
+[InternetShortcut]
+URL=http://msdn2.microsoft.com/zh-cn/default.aspx
+Modified=30F615B71046C80111
+IconFile=http://msdn2.microsoft.com/favicon.ico
+IconIndex=1

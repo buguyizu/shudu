@@ -1,0 +1,10 @@
+[DEFAULT]
+BASEURL=http://blog.csdn.net/lenhan12345/archive/2006/12/25/1459667.aspx
+[DOC_myframe]
+BASEURL=http://www.csdn.net/ggmm/dd333.htm
+ORIGURL=http://www.csdn.net/ggmm/dd333.htm
+[InternetShortcut]
+URL=http://blog.csdn.net/lenhan12345/archive/2006/12/25/1459667.aspx
+Modified=808AADCE0B67C801C0
+IconFile=http://profile.csdn.net/lenhan12345/picture/1.ico
+IconIndex=1

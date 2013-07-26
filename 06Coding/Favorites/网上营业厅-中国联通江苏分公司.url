@@ -1,0 +1,9 @@
+[DEFAULT]
+BASEURL=http://www.10010js.com/cas/login?service=http%3A%2F%2Fwww.10010js.com%2Fusermanage%2FLoginCtrl.do%3FreturnUrl%3D%2Fwdzh%2Fzhxx%2Fmyzone_interInfo.shtml
+[InternetShortcut]
+URL=http://www.10010js.com/cas/login?service=http%3A%2F%2Fwww.10010js.com%2Fusermanage%2FLoginCtrl.do%3FreturnUrl%3D%2Fwdzh%2Fzhxx%2Fmyzone_interInfo.shtml
+IDList=
+IconFile=http://www.10010js.com/favicon.ico
+IconIndex=1
+[{000214A0-0000-0000-C000-000000000046}]
+Prop3=19,2

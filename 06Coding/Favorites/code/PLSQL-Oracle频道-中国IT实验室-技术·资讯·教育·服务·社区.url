@@ -1,0 +1,10 @@
+[DEFAULT]
+BASEURL=http://oracle.chinaitlab.com/List_15_9.html
+[DOC_xp_content_iframe]
+BASEURL=http://www.chinaitlab.com/gmail/hot/hot.html
+ORIGURL=http://www.chinaitlab.com/gmail/hot/hot.html
+[InternetShortcut]
+URL=http://oracle.chinaitlab.com/List_15_9.html
+Modified=E03166ACF808C901ED
+IconFile=http://www.chinaitlab.com/favicon.ico
+IconIndex=1
