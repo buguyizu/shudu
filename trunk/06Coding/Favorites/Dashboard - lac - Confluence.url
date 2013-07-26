@@ -1,0 +1,7 @@
+[DEFAULT]
+BASEURL=http://172.17.1.24:8080/confluence/dashboard.action
+[InternetShortcut]
+URL=http://172.17.1.24:8080/confluence/dashboard.action
+Modified=30FBC48B0B76C901C5
+IconFile=http://172.17.1.24:8080/confluence/images/icons/favicon.ico
+IconIndex=1

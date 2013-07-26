@@ -1,0 +1,16 @@
+[DEFAULT]
+BASEURL=http://hc.apache.org/httpclient-3.x/apidocs/index.html
+[DOC#9#10#11]
+BASEURL=http://hc.apache.org/httpclient-3.x/apidocs/overview-frame.html
+ORIGURL=overview-frame.html
+[DOC#9#10#12]
+BASEURL=http://hc.apache.org/httpclient-3.x/apidocs/org/apache/commons/httpclient/methods/multipart/package-frame.html
+ORIGURL=allclasses-frame.html
+[DOC#9#13]
+BASEURL=http://hc.apache.org/httpclient-3.x/apidocs/org/apache/commons/httpclient/methods/multipart/MultipartRequestEntity.html
+ORIGURL=overview-summary.html
+[InternetShortcut]
+URL=http://hc.apache.org/httpclient-3.x/apidocs/index.html
+Modified=70181EBBBEF6C801DE
+IconFile=http://hc.apache.org/favicon.ico
+IconIndex=1

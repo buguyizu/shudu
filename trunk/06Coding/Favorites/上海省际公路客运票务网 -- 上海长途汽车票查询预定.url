@@ -1,0 +1,8 @@
+[DEFAULT]
+BASEURL=http://www.cgbchina.com/index.jsp
+[DOC_CalFrame]
+BASEURL=http://www.cgbchina.com/calendar.htm
+ORIGURL=calendar.htm
+[InternetShortcut]
+URL=http://www.cgbchina.com/index.jsp
+Modified=30A18F2EC0D1C801E8
